@@ -24,7 +24,7 @@ Ce mini-projet a pour but de créer une API simple en Python qui expose une list
 sudo systemctl start docker
 sudo systemctl enable docker
 ```
-![Démarrage Docker](data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...)
+![Démarrage Docker](./captures/1.png)
 
 ---
 
@@ -38,7 +38,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 CMD ["python", "./student_age.py"]
 ```
-![Image Docker créée](data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...)
+![Image Docker créée](captures/2.png)
 
 ---
 

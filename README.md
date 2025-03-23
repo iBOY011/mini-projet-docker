@@ -1,201 +1,146 @@
-# Mini-Projet Docker : Application Python (API Flask) + Site Web PHP
+# Projet Docker - Gestion de la liste des étudiants
 
-## Table des matières
-1. [Introduction](#introduction)  
-2. [Prérequis](#prérequis)  
-3. [Structure du Projet](#structure-du-projet)  
-4. [Conteneurisation de l’API Flask](#conteneurisation-de-lapi-flask)  
-5. [Orchestration avec Docker Compose](#orchestration-avec-docker-compose)  
-6. [Mise en Place du Docker Registry Privé](#mise-en-place-du-docker-registry-privé)  
-7. [Résultats et Captures d’Écran](#résultats-et-captures-décran)  
-8. [Problèmes Rencontrés et Solutions](#problèmes-rencontrés-et-solutions)  
-9. [Conclusion](#conclusion)
+## Auteurs
+**Nom :** Haitam Lahlaouti
 
 ---
 
-## Introduction
-
-Ce mini-projet a pour objectif de **containeriser** une application composée de deux modules :  
-- Une **API REST** écrite en Python (Flask) pour afficher et gérer la liste des étudiants.  
-- Un **site web** en PHP permettant d’afficher la liste des étudiants récupérée depuis l’API.  
-
-Ensuite, nous avons **orchestré** ces deux services avec Docker Compose et **déployé un registre privé** pour stocker et gérer nos images Docker localement.
+## 📌 Objectif du projet
+Ce mini-projet a pour but de créer une API simple en Python qui expose une liste d'étudiants et leurs âges, de la conteneuriser avec Docker, de la déployer avec Docker Compose, et de pousser l'image vers un registre Docker privé visualisable via une interface graphique.
 
 ---
 
-## Prérequis
-
-- **Ubuntu 24.04** (ou équivalent).  
-- **Docker** et **Docker Compose** installés et fonctionnels.  
-  - Vérification avec :
-    ```bash
-    docker --version
-    docker-compose --version
-    ```
-- Accès à un éditeur de texte ou IDE (VSCode, nano, vim, etc.).
+## 🧱 Prérequis
+- Docker installé et actif
+- Docker Compose installé
+- Système basé sur Linux (Ubuntu recommandé)
 
 ---
 
-## Structure du Projet
+## 🔧 Étapes du projet
 
+### 1. Démarrage du service Docker
+```bash
+sudo systemctl start docker
+sudo systemctl enable docker
 ```
-mini-projet-docker/
-├── Dockerfile
-├── docker-compose.yml
-├── docker-compose-registry.yml
-├── requirements.txt
-├── student_age.py
-├── student_age.json
-├── website/
-│   └── index.php
-└── README.md
-```
+![Démarrage Docker](data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...)
 
 ---
 
-## Conteneurisation de l’API Flask
-
-1. **Dockerfile**
-
+### 2. Création de l'image Docker pour l'API
+Voici le `Dockerfile` utilisé :
 ```Dockerfile
-FROM python:3.8-buster
-LABEL maintainer="Lahlaouti Haitam <haitamlahlaouti01@gmail.com>"
-RUN apt update -y && apt install python3-dev libsasl2-dev libldap2-dev libssl-dev -y
+FROM python:3
 WORKDIR /usr/src/app
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
-COPY student_age.py .
-RUN mkdir /data
-VOLUME /data
-EXPOSE 5000
-CMD [ "python", "./student_age.py" ]
+COPY . .
+CMD ["python", "./student_age.py"]
 ```
-
-2. **Construction**
-```bash
-docker build -t student_list_api .
-```
-![Build image](captures/3.png)
-
-3. **Exécution**
-```bash
-docker run -d -p 5000:5000 \
--v $(pwd)/student_age.json:/data/student_age.json \
-student_list_api
-```
-![Container Run](captures/5.png)
-
-4. **Test avec CURL**
-```bash
-curl -u root:root http://localhost:5000/supmit/api/v1.0/get_student_ages
-```
-![API Test](captures/7.png)
+![Image Docker créée](data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...)
 
 ---
 
-## Orchestration avec Docker Compose
-
-1. **Fichier docker-compose.yml**
-```yaml
-version: '3'
-services:
-  api:
-    image: student_list_api
-    container_name: student_list_api_container
-    volumes:
-      - ./student_age.json:/data/student_age.json
-    ports:
-      - "5000:5000"
-    networks:
-      - my_app_network
-
-  website:
-    image: php:apache
-    depends_on:
-      - api
-    ports:
-      - "8080:80"
-    volumes:
-      - ./website:/var/www/html
-    networks:
-      - my_app_network
-
-networks:
-  my_app_network:
-    driver: bridge
+### 3. Vérification de l'image construite
+```bash
+docker images
 ```
+![Vérification image Docker](data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...)
 
-2. **Lancement**
+---
+
+### 4. Lancement du conteneur avec Docker
+```bash
+docker run -d -p 5000:5000 -v $(pwd)/student_age.json:/data/student_age.json student_list_api
+```
+![Conteneur démarré](data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...)
+
+---
+
+### 5. Vérification de l'état du conteneur
+```bash
+docker ps
+```
+![Conteneur en cours d'exécution](data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...)
+
+---
+
+### 6. Consultation des logs du conteneur
+```bash
+docker logs <CONTAINER_ID>
+```
+![Logs du serveur Flask](data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...)
+
+---
+
+### 7. Test de l'API avec `curl`
+```bash
+curl -u root:root -X GET http://localhost:5000/supmit/api/v1.0/get_student_ages
+```
+![Test avec curl](data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...)
+
+---
+
+### 8. Utilisation de Docker Compose pour lancer plusieurs services
 ```bash
 docker-compose up -d
 ```
-![Docker Compose Up](captures/9.png)
-
-3. **Accès Web**
-- [http://localhost:8080](http://localhost:8080)
-
-![Interface vide](captures/11.png)
-![Résultat liste](captures/12.png)
+![Docker Compose](data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...)
 
 ---
 
-## Mise en Place du Docker Registry Privé
-
-1. **Registre**
+### 9. Affichage des conteneurs lancés
 ```bash
-docker run -d -p 5001:5000 --name registry registry:2
+docker-compose ps
+```
+![Conteneurs actifs](data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...)
+
+---
+
+### 10. Interface Web PHP (client)
+![Interface web initiale](data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...)
+![Résultat affiché](data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...)
+
+---
+
+### 11. Mise en place du registre privé avec UI
+```bash
+docker-compose -f docker-compose-registry.yml up -d
+```
+![Démarrage du registre](data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...)
+
+---
+
+### 12. Accès à l’interface UI du registre
+- Lien : http://localhost:8083
+![UI du registre](data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...)
+![Détail image poussée](data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...)
+
+---
+
+### 13. Push de l’image dans le registre
+```bash
+docker tag student_list_api localhost:5000/student_list_api
+
+docker push localhost:5000/student_list_api
 ```
 
-2. **Interface web**
-```bash
-docker run -d \
--p 8083:80 \
---name registry_ui \
--e REGISTRY_TITLE="Mon_Registry_Privé" \
--e REGISTRY_URL="http://localhost:5001" \
-joxit/docker-registry-ui
-```
+---
 
-![Registry UI](captures/14.png)
-![Image tag](captures/15.png)
+## 📁 Fichiers du projet
 
-3. **Push de l'image**
-```bash
-docker tag student_list_api localhost:5001/student_list_api:v1
-docker push localhost:5001/student_list_api:v1
-```
+- `Dockerfile` : Construction de l'image Python
+- `docker-compose.yml` : Déploiement de l’API + client web
+- `docker-compose-registry.yml` : Déploiement du registre Docker privé avec UI
 
 ---
 
-## Résultats et Captures d’Écran
-
-Les captures se trouvent dans le dossier `captures/` :
-- Installation Docker : `1.png`, `2.png`
-- Build et exécution API : `3.png` à `7.png`
-- Docker Compose : `8.png`, `9.png`, `10.png`
-- Interface web : `11.png`, `12.png`
-- Registry : `13.png`, `14.png`, `15.png`
+## ✅ Résultat final
+Une API Flask Dockerisée avec une interface web fonctionnelle + une interface de registre privé consultable via navigateur.
 
 ---
 
-## Problèmes Rencontrés et Solutions
-
-- **Port 5000 déjà utilisé** : solution → kill ou changer le port.
-- **Docker compose erreur** : `compose is not a docker command` → utilisé `docker-compose` classique.
-- **Erreur ContainerConfig** : version Docker Compose corrigée (v1.29.2).
-
----
-
-## Conclusion
-
-Nous avons :
-- Conteneurisé une API Flask
-- Créé une interface Web
-- Utilisé Docker Compose pour les orchestrer
-- Déployé un registre privé pour nos images
-
-Le projet montre les avantages clairs de Docker dans la déploiement rapide, la modularité et l'évolution de projets multi-composants.
-
----
-
+## 📷 Captures d’écran intégrées
+Toutes les captures d'écran sont intégrées directement dans ce fichier README.md.
 

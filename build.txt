@@ -1,0 +1,217 @@
+iboy@iBOY-s-Computer:~/Documents/GI2/S2/DevOps/DockerMiniProjet/student_list/simple_api$ docker build -t student_list_api .
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+
+Sending build context to Docker daemon  7.168kB
+Step 1/11 : FROM python:3.8-buster
+3.8-buster: Pulling from library/python
+ac8bb7e1a323: Pull complete 
+3b1c264c0ad4: Pull complete 
+b1e7e053c9f6: Pull complete 
+a2e1e233599c: Pull complete 
+0ebfe287e976: Pull complete 
+819d305a9b22: Pull complete 
+a11e135762f0: Pull complete 
+5e4e21ea7d04: Pull complete 
+Digest: sha256:04c3f641c2254c229fd2f704c5199ff4bea57d26c1c29008ae3a4afddde98709
+Status: Downloaded newer image for python:3.8-buster
+ ---> 406c7153026b
+Step 2/11 : LABEL maintainer="Lahlaouti Haitam <haitamlahlaouti01@gmail.com>"
+ ---> Running in e9dff2637361
+ ---> Removed intermediate container e9dff2637361
+ ---> 686afeecc576
+Step 3/11 : RUN apt update -y && apt install python3-dev libsasl2-dev libldap2-dev libssl-dev -y
+ ---> Running in 70186daeebe3
+
+WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+
+Get:1 http://deb.debian.org/debian buster InRelease [122 kB]
+Get:2 http://deb.debian.org/debian-security buster/updates InRelease [34.8 kB]
+Get:3 http://deb.debian.org/debian buster-updates InRelease [56.6 kB]
+Get:4 http://deb.debian.org/debian buster/main amd64 Packages [7909 kB]
+Get:5 http://deb.debian.org/debian-security buster/updates/main amd64 Packages [610 kB]
+Get:6 http://deb.debian.org/debian buster-updates/main amd64 Packages [8788 B]
+Fetched 8741 kB in 5s (1700 kB/s)
+Reading package lists...
+Building dependency tree...
+Reading state information...
+106 packages can be upgraded. Run 'apt list --upgradable' to see them.
+
+WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
+
+Reading package lists...
+Building dependency tree...
+Reading state information...
+The following additional packages will be installed:
+  dh-python libpython3-dev libpython3.7 libpython3.7-dev libpython3.7-minimal
+  libpython3.7-stdlib libssl1.1 python3.7 python3.7-dev python3.7-minimal
+Suggested packages:
+  libssl-doc python3.7-venv python3.7-doc binfmt-support
+The following NEW packages will be installed:
+  dh-python libldap2-dev libpython3-dev libpython3.7 libpython3.7-dev
+  libsasl2-dev python3-dev python3.7-dev
+The following packages will be upgraded:
+  libpython3.7-minimal libpython3.7-stdlib libssl-dev libssl1.1 python3.7
+  python3.7-minimal
+6 upgraded, 8 newly installed, 0 to remove and 100 not upgraded.
+Need to get 58.9 MB of archives.
+After this operation, 91.9 MB of additional disk space will be used.
+Get:1 http://deb.debian.org/debian-security buster/updates/main amd64 libssl-dev amd64 1.1.1n-0+deb10u6 [1810 kB]
+Get:2 http://deb.debian.org/debian-security buster/updates/main amd64 libssl1.1 amd64 1.1.1n-0+deb10u6 [1552 kB]
+Get:3 http://deb.debian.org/debian-security buster/updates/main amd64 python3.7 amd64 3.7.3-2+deb10u7 [331 kB]
+Get:4 http://deb.debian.org/debian-security buster/updates/main amd64 libpython3.7-stdlib amd64 3.7.3-2+deb10u7 [1733 kB]
+Get:5 http://deb.debian.org/debian-security buster/updates/main amd64 python3.7-minimal amd64 3.7.3-2+deb10u7 [1735 kB]
+Get:6 http://deb.debian.org/debian-security buster/updates/main amd64 libpython3.7-minimal amd64 3.7.3-2+deb10u7 [590 kB]
+Get:7 http://deb.debian.org/debian buster/main amd64 dh-python all 3.20190308 [99.3 kB]
+Get:8 http://deb.debian.org/debian buster/main amd64 libldap2-dev amd64 2.4.47+dfsg-3+deb10u7 [332 kB]
+Get:9 http://deb.debian.org/debian-security buster/updates/main amd64 libpython3.7 amd64 3.7.3-2+deb10u7 [1499 kB]
+Get:10 http://deb.debian.org/debian-security buster/updates/main amd64 libpython3.7-dev amd64 3.7.3-2+deb10u7 [48.4 MB]
+Get:11 http://deb.debian.org/debian buster/main amd64 libpython3-dev amd64 3.7.3-1 [20.1 kB]
+Get:12 http://deb.debian.org/debian buster/main amd64 libsasl2-dev amd64 2.1.27+dfsg-1+deb10u2 [283 kB]
+Get:13 http://deb.debian.org/debian-security buster/updates/main amd64 python3.7-dev amd64 3.7.3-2+deb10u7 [514 kB]
+Get:14 http://deb.debian.org/debian buster/main amd64 python3-dev amd64 3.7.3-1 [1264 B]
+debconf: delaying package configuration, since apt-utils is not installed
+Fetched 58.9 MB in 28s (2092 kB/s)
+(Reading database ... 24615 files and directories currently installed.)
+Preparing to unpack .../00-libssl-dev_1.1.1n-0+deb10u6_amd64.deb ...
+Unpacking libssl-dev:amd64 (1.1.1n-0+deb10u6) over (1.1.1n-0+deb10u5) ...
+Preparing to unpack .../01-libssl1.1_1.1.1n-0+deb10u6_amd64.deb ...
+Unpacking libssl1.1:amd64 (1.1.1n-0+deb10u6) over (1.1.1n-0+deb10u5) ...
+Preparing to unpack .../02-python3.7_3.7.3-2+deb10u7_amd64.deb ...
+Unpacking python3.7 (3.7.3-2+deb10u7) over (3.7.3-2+deb10u4) ...
+Preparing to unpack .../03-libpython3.7-stdlib_3.7.3-2+deb10u7_amd64.deb ...
+Unpacking libpython3.7-stdlib:amd64 (3.7.3-2+deb10u7) over (3.7.3-2+deb10u4) ...
+Preparing to unpack .../04-python3.7-minimal_3.7.3-2+deb10u7_amd64.deb ...
+Unpacking python3.7-minimal (3.7.3-2+deb10u7) over (3.7.3-2+deb10u4) ...
+Preparing to unpack .../05-libpython3.7-minimal_3.7.3-2+deb10u7_amd64.deb ...
+Unpacking libpython3.7-minimal:amd64 (3.7.3-2+deb10u7) over (3.7.3-2+deb10u4) ...
+Selecting previously unselected package dh-python.
+Preparing to unpack .../06-dh-python_3.20190308_all.deb ...
+Unpacking dh-python (3.20190308) ...
+Selecting previously unselected package libldap2-dev:amd64.
+Preparing to unpack .../07-libldap2-dev_2.4.47+dfsg-3+deb10u7_amd64.deb ...
+Unpacking libldap2-dev:amd64 (2.4.47+dfsg-3+deb10u7) ...
+Selecting previously unselected package libpython3.7:amd64.
+Preparing to unpack .../08-libpython3.7_3.7.3-2+deb10u7_amd64.deb ...
+Unpacking libpython3.7:amd64 (3.7.3-2+deb10u7) ...
+Selecting previously unselected package libpython3.7-dev:amd64.
+Preparing to unpack .../09-libpython3.7-dev_3.7.3-2+deb10u7_amd64.deb ...
+Unpacking libpython3.7-dev:amd64 (3.7.3-2+deb10u7) ...
+Selecting previously unselected package libpython3-dev:amd64.
+Preparing to unpack .../10-libpython3-dev_3.7.3-1_amd64.deb ...
+Unpacking libpython3-dev:amd64 (3.7.3-1) ...
+Selecting previously unselected package libsasl2-dev.
+Preparing to unpack .../11-libsasl2-dev_2.1.27+dfsg-1+deb10u2_amd64.deb ...
+Unpacking libsasl2-dev (2.1.27+dfsg-1+deb10u2) ...
+Selecting previously unselected package python3.7-dev.
+Preparing to unpack .../12-python3.7-dev_3.7.3-2+deb10u7_amd64.deb ...
+Unpacking python3.7-dev (3.7.3-2+deb10u7) ...
+Selecting previously unselected package python3-dev.
+Preparing to unpack .../13-python3-dev_3.7.3-1_amd64.deb ...
+Unpacking python3-dev (3.7.3-1) ...
+Setting up dh-python (3.20190308) ...
+Setting up libssl1.1:amd64 (1.1.1n-0+deb10u6) ...
+debconf: unable to initialize frontend: Dialog
+debconf: (TERM is not set, so the dialog frontend is not usable.)
+debconf: falling back to frontend: Readline
+Setting up libpython3.7-minimal:amd64 (3.7.3-2+deb10u7) ...
+Setting up libldap2-dev:amd64 (2.4.47+dfsg-3+deb10u7) ...
+Setting up libsasl2-dev (2.1.27+dfsg-1+deb10u2) ...
+Setting up libssl-dev:amd64 (1.1.1n-0+deb10u6) ...
+Setting up python3.7-minimal (3.7.3-2+deb10u7) ...
+Setting up libpython3.7-stdlib:amd64 (3.7.3-2+deb10u7) ...
+Setting up libpython3.7:amd64 (3.7.3-2+deb10u7) ...
+Setting up libpython3.7-dev:amd64 (3.7.3-2+deb10u7) ...
+Setting up python3.7 (3.7.3-2+deb10u7) ...
+Setting up libpython3-dev:amd64 (3.7.3-1) ...
+Setting up python3.7-dev (3.7.3-2+deb10u7) ...
+Setting up python3-dev (3.7.3-1) ...
+Processing triggers for libc-bin (2.28-10+deb10u2) ...
+Processing triggers for mime-support (3.62) ...
+ ---> Removed intermediate container 70186daeebe3
+ ---> 37435fd437a7
+Step 4/11 : WORKDIR /usr/src/app
+ ---> Running in e55ca3011dfa
+ ---> Removed intermediate container e55ca3011dfa
+ ---> d4727fdedfd3
+Step 5/11 : COPY requirements.txt ./
+ ---> 093baeffa9eb
+Step 6/11 : RUN pip install --no-cache-dir -r requirements.txt
+ ---> Running in d97587a9553a
+Collecting flask==2.0.0
+  Downloading Flask-2.0.0-py3-none-any.whl (93 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 93.2/93.2 kB 951.1 kB/s eta 0:00:00
+Collecting flask_httpauth==4.1.0
+  Downloading Flask_HTTPAuth-4.1.0-py2.py3-none-any.whl (5.8 kB)
+Collecting flask_simpleldap
+  Downloading Flask_SimpleLDAP-2.0.0-py3-none-any.whl (8.6 kB)
+Collecting python-dotenv==0.14.0
+  Downloading python_dotenv-0.14.0-py2.py3-none-any.whl (17 kB)
+Collecting Werkzeug==2.0.0
+  Downloading Werkzeug-2.0.0-py3-none-any.whl (288 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 288.1/288.1 kB 2.1 MB/s eta 0:00:00
+Collecting itsdangerous>=2.0
+  Downloading itsdangerous-2.2.0-py3-none-any.whl (16 kB)
+Collecting click>=7.1.2
+  Downloading click-8.1.8-py3-none-any.whl (98 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 98.2/98.2 kB 2.6 MB/s eta 0:00:00
+Collecting Jinja2>=3.0
+  Downloading jinja2-3.1.6-py3-none-any.whl (134 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 134.9/134.9 kB 2.6 MB/s eta 0:00:00
+Collecting flask_simpleldap
+  Downloading Flask_SimpleLDAP-1.4.0-py3-none-any.whl (6.2 kB)
+Collecting python-ldap>=3.0.0
+  Downloading python-ldap-3.4.4.tar.gz (377 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 377.9/377.9 kB 2.1 MB/s eta 0:00:00
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Collecting MarkupSafe>=2.0
+  Downloading MarkupSafe-2.1.5-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (26 kB)
+Collecting pyasn1-modules>=0.1.5
+  Downloading pyasn1_modules-0.4.1-py3-none-any.whl (181 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 181.5/181.5 kB 3.0 MB/s eta 0:00:00
+Collecting pyasn1>=0.3.7
+  Downloading pyasn1-0.6.1-py3-none-any.whl (83 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 83.1/83.1 kB 4.7 MB/s eta 0:00:00
+Building wheels for collected packages: python-ldap
+  Building wheel for python-ldap (pyproject.toml): started
+  Building wheel for python-ldap (pyproject.toml): finished with status 'done'
+  Created wheel for python-ldap: filename=python_ldap-3.4.4-cp38-cp38-linux_x86_64.whl size=332275 sha256=a8da6209905910273c7e8d2220695260c32bfe040ca5e267b11b1482abf1e446
+  Stored in directory: /tmp/pip-ephem-wheel-cache-zkxqjkuq/wheels/84/2b/fe/721f5feaad70542979bfd3e2a85ccbd26cddc8025d9f1dcd30
+Successfully built python-ldap
+Installing collected packages: python-dotenv, Werkzeug, pyasn1, MarkupSafe, itsdangerous, click, pyasn1-modules, Jinja2, python-ldap, flask, flask_simpleldap, flask_httpauth
+Successfully installed Jinja2-3.1.6 MarkupSafe-2.1.5 Werkzeug-2.0.0 click-8.1.8 flask-2.0.0 flask_httpauth-4.1.0 flask_simpleldap-1.4.0 itsdangerous-2.2.0 pyasn1-0.6.1 pyasn1-modules-0.4.1 python-dotenv-0.14.0 python-ldap-3.4.4
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+
+[notice] A new release of pip is available: 23.0.1 -> 25.0.1
+[notice] To update, run: pip install --upgrade pip
+ ---> Removed intermediate container d97587a9553a
+ ---> dc85b9e00681
+Step 7/11 : COPY student_age.py .
+ ---> b07148b8b77d
+Step 8/11 : RUN mkdir /data
+ ---> Running in 99658dc98865
+ ---> Removed intermediate container 99658dc98865
+ ---> ea3cefd4849f
+Step 9/11 : VOLUME /data
+ ---> Running in a5f5d6c4ebd0
+ ---> Removed intermediate container a5f5d6c4ebd0
+ ---> 94d36c9aee8b
+Step 10/11 : EXPOSE 5000
+ ---> Running in ee05fffc1c6d
+ ---> Removed intermediate container ee05fffc1c6d
+ ---> b355633017ca
+Step 11/11 : CMD [ "python", "./student_age.py" ]
+ ---> Running in d263aec01c48
+ ---> Removed intermediate container d263aec01c48
+ ---> 750370c6ab42
+Successfully built 750370c6ab42
+Successfully tagged student_list_api:latest
+iboy@iBOY-s-Computer:~/Documents/GI2/S2/DevOps/DockerMiniProjet/student_list/simple_api$ 
+
+

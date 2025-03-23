@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  api:
+    image: student_list_api
+    container_name: student_list_api_container
+    volumes:
+      - ./student_age.json:/data/student_age.json
+    ports:
+      - "5000:5000"
+    networks:
+      - my_app_network
+
+  website:
+    image: php:apache
+    depends_on:
+      - api
+    ports:
+      - "8081:80"
+    volumes:
+    - /home/iboy/Documents/GI2/S2/DevOps/DockerMiniProjet/student_list/website:/var/www/html
+    environment:
+      - API_USERNAME=root
+      - API_PASSWORD=root
+    networks:
+      - my_app_network
+
+networks:
+  my_app_network:
+    driver: bridge

@@ -144,6 +144,17 @@ Une API Flask Dockerisée avec une interface web fonctionnelle + une interface d
 
 ---
 
+## 🧠 Conclusion
+
+Ce projet nous a permis de comprendre et de mettre en pratique les concepts essentiels de Docker et Docker Compose, tout en découvrant la gestion d’un registre privé et son interface UI. Une mise en situation réaliste et complète, idéale pour consolider nos compétences DevOps.
+
+---
+
 ## 📷 Captures d’écran intégrées
 Toutes les captures d'écran sont intégrées directement dans ce fichier README.md.
+
+---
+
+📎 [Lien vers le dépôt GitHub du projet](https://github.com/iBOY011/mini-projet-docker)
+
 

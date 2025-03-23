@@ -46,7 +46,7 @@ CMD ["python", "./student_age.py"]
 ```bash
 docker images
 ```
-![Vérification image Docker](data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...)
+![Vérification image Docker](captures/3.png)
 
 ---
 
@@ -54,7 +54,7 @@ docker images
 ```bash
 docker run -d -p 5000:5000 -v $(pwd)/student_age.json:/data/student_age.json student_list_api
 ```
-![Conteneur démarré](data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...)
+![Conteneur démarré](captures/4.png)
 
 ---
 
@@ -62,7 +62,7 @@ docker run -d -p 5000:5000 -v $(pwd)/student_age.json:/data/student_age.json stu
 ```bash
 docker ps
 ```
-![Conteneur en cours d'exécution](data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...)
+![Conteneur en cours d'exécution](captures/5.png)
 
 ---
 
@@ -70,7 +70,7 @@ docker ps
 ```bash
 docker logs <CONTAINER_ID>
 ```
-![Logs du serveur Flask](data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...)
+![Logs du serveur Flask](captures/6.png)
 
 ---
 
@@ -78,7 +78,7 @@ docker logs <CONTAINER_ID>
 ```bash
 curl -u root:root -X GET http://localhost:5000/supmit/api/v1.0/get_student_ages
 ```
-![Test avec curl](data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...)
+![Test avec curl](captures/7.png)
 
 ---
 
@@ -86,7 +86,7 @@ curl -u root:root -X GET http://localhost:5000/supmit/api/v1.0/get_student_ages
 ```bash
 docker-compose up -d
 ```
-![Docker Compose](data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...)
+![Docker Compose](captures/8.png)
 
 ---
 
@@ -94,13 +94,13 @@ docker-compose up -d
 ```bash
 docker-compose ps
 ```
-![Conteneurs actifs](data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...)
+![Conteneurs actifs](captures/9.png)
 
 ---
 
 ### 10. Interface Web PHP (client)
-![Interface web initiale](data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...)
-![Résultat affiché](data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...)
+![Interface web initiale](captures/11.png)
+![Résultat affiché](captures/12.png)
 
 ---
 
@@ -108,14 +108,14 @@ docker-compose ps
 ```bash
 docker-compose -f docker-compose-registry.yml up -d
 ```
-![Démarrage du registre](data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...)
+![Démarrage du registre](captures/13.png)
 
 ---
 
 ### 12. Accès à l’interface UI du registre
 - Lien : http://localhost:8083
-![UI du registre](data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...)
-![Détail image poussée](data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...)
+![UI du registre](captures/14.png)
+![Détail image poussée](captures/15.png)
 
 ---
 

@@ -198,5 +198,4 @@ Le projet montre les avantages clairs de Docker dans la déploiement rapide, la 
 
 ---
 
-**Lien du projet :** [https://github.com/ton-user/mini-projet-docker](https://github.com/ton-user/mini-projet-docker) *(remplacer par le lien réel)*
 

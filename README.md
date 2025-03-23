@@ -39,6 +39,7 @@ COPY . .
 CMD ["python", "./student_age.py"]
 ```
 ![Image Docker créée](captures/2.png)
+![Image Docker créée](captures/3.png)
 
 ---
 
@@ -46,7 +47,7 @@ CMD ["python", "./student_age.py"]
 ```bash
 docker images
 ```
-![Vérification image Docker](captures/3.png)
+![Vérification image Docker](captures/4.png)
 
 ---
 
@@ -54,7 +55,7 @@ docker images
 ```bash
 docker run -d -p 5000:5000 -v $(pwd)/student_age.json:/data/student_age.json student_list_api
 ```
-![Conteneur démarré](captures/4.png)
+![Conteneur démarré](captures/5.png)
 
 ---
 
@@ -87,6 +88,8 @@ curl -u root:root -X GET http://localhost:5000/supmit/api/v1.0/get_student_ages
 docker-compose up -d
 ```
 ![Docker Compose](captures/8.png)
+![Docker Compose](captures/9.png)
+
 
 ---
 
@@ -94,7 +97,7 @@ docker-compose up -d
 ```bash
 docker-compose ps
 ```
-![Conteneurs actifs](captures/9.png)
+![Conteneurs actifs](captures/10.png)
 
 ---
 

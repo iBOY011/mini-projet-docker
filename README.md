@@ -131,6 +131,18 @@ docker push localhost:5000/student_list_api
 
 ---
 
+🚀 Intégration Continue & Déploiement (CI/CD)
+Une pipeline CI/CD a été configurée avec Jenkins pour automatiser les étapes suivantes :
+
+Clonage du dépôt Git
+Build de l'image Docker de l'API
+Test de l'API Flask avec un appel curl
+Push automatique de l'image sur Docker Hub si le test est réussi
+
+Exemple de pipeline Jenkinsfile
+groovy
+---
+
 ## 📁 Fichiers du projet
 
 - `Dockerfile` : Construction de l'image Python
@@ -141,12 +153,42 @@ docker push localhost:5000/student_list_api
 
 ## ✅ Résultat final
 Une API Flask Dockerisée avec une interface web fonctionnelle + une interface de registre privé consultable via navigateur.
+Après exécution du pipeline sur Jenkins, l’application a été :
+
+    Construite avec succès via un Dockerfile optimisé ✅
+
+    Testée automatiquement avec un appel curl pour valider le fonctionnement de l’API ✅
+
+    Déployée sur Docker Hub si l’API fonctionne correctement ✅
+
+Le fichier JSON a bien été monté dans le conteneur grâce au volume Docker, et l’API retourne les bonnes données :
+`{
+`  "student_ages": {
+`    "Ahmed": "20", 
+`    "Amine": "20", 
+ `   "Hiba": "21", 
+ `   "Meryem": "23", 
+ `   "Omar": "20", 
+ `   "Sara": "23"
+ ` }
+`}
+
 
 ---
 
 ## 🧠 Conclusion
 
-Ce projet nous a permis de comprendre et de mettre en pratique les concepts essentiels de Docker et Docker Compose, tout en découvrant la gestion d’un registre privé et son interface UI. Une mise en situation réaliste et complète, idéale pour consolider nos compétences DevOps.
+Ce projet nous a permis de mettre en pratique plusieurs compétences clés :
+
+    Création d’une API REST simple avec Flask 🔧
+
+    Conteneurisation avec Docker 🐳
+
+    Automatisation avec Jenkins pour une pipeline CI/CD complète 🔁
+
+    Gestion des erreurs réelles et résolution de bugs liés aux volumes, aux ports, et au timing de démarrage de conteneurs 🐞
+
+    💡 Ce projet représente un excellent point de départ vers des workflows DevOps professionnels (CI/CD, Docker, tests, déploiement).
 
 ---
 

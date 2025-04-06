@@ -10,7 +10,9 @@ WORKDIR /usr/src/app
 
 # Copier le fichier des dépendances et installer les packages Python
 COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+# RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip && pip install --default-timeout=100 --no-cache-dir -r requirements.txt
+
 
 # Copier le script de l'API
 COPY student_age.py .

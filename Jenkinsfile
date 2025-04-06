@@ -26,7 +26,7 @@ pipeline {
                     returnStdout: true
                     ).trim()
                     sleep 30  // donner plus de temps à l'API pour démarrer
-                    def response = spipeline {
+                    def response = pipeline {
     agent any
 
     environment {

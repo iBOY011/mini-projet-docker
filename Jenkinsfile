@@ -21,12 +21,14 @@ pipeline {
             steps {
                 script {
                     def containerId = sh(script: "docker run -d -p 5000:5000 $IMAGE_NAME", returnStdout: true).trim()
-                    sleep 10
-                    sh 'curl -u root:root http://localhost:5000/supmit/api/v1.0/get_student_ages'
+                    sleep 10  // laisse le temps à l'API de démarrer
+                    // Utilise l'IP de l'hôte au lieu de localhost
+                    sh 'curl -u root:root http://172.17.0.1:5000/supmit/api/v1.0/get_student_ages'
                     sh "docker stop $containerId"
                 }
             }
         }
+
 
         stage('Pousser sur Docker Hub') {
             steps {

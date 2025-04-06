@@ -2,14 +2,12 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "iboy01/student_list_api"
-        DOCKER_CREDENTIALS_ID = "dockerhub-creds"
+        DOCKER_IMAGE = 'iboy01/student_list_api'
     }
 
     stages {
         stage('Cloner le dépôt') {
             steps {
-                // Jenkins gère le clonage via la configuration SCM du job.
                 echo 'Clonage du dépôt'
             }
         }
@@ -18,7 +16,7 @@ pipeline {
             steps {
                 dir('student_list/simple_api') {
                     script {
-                        sh 'docker build -t $IMAGE_NAME .'
+                        sh "docker build -t $DOCKER_IMAGE ."
                     }
                 }
             }
@@ -27,32 +25,40 @@ pipeline {
         stage('Tester l\'API') {
             steps {
                 script {
-                    // Lancer le conteneur API en montant le fichier JSON en lecture seule
+                    // Lancer le conteneur avec montage du fichier student_age.json
                     def containerId = sh(
-                        script: "docker run -d -p 5000:5000 -v ${WORKSPACE}/student_list/simple_api/student_age.json:/data/student_age.json:ro iboy01/student_list_api",
+                        script: "docker run -d -p 5000:5000 -v ${pwd()}/student_list/simple_api/student_age.json:/data/student_age.json:ro $DOCKER_IMAGE",
                         returnStdout: true
                     ).trim()
-                    
-                    sleep 30  // Attendre que l'API démarre
-                    
-                    def status = sh(script: "curl -u root:root http://localhost:5000/supmit/api/v1.0/get_student_ages", returnStatus: true)
-                    if (status != 0) {
+
+                    // Attendre un peu que l'API démarre
+                    sleep(time: 30, unit: 'SECONDS')
+
+                    // Tester l'API
+                    try {
+                        sh 'curl -u root:root http://localhost:5000/supmit/api/v1.0/get_student_ages'
+                    } catch (Exception e) {
                         echo "Erreur lors de l'appel de l'API, affichage des logs du conteneur :"
                         sh "docker logs ${containerId}"
-                        error "L'API ne répond pas correctement."
+                        error("L'API ne répond pas correctement.")
+                    } finally {
+                        sh "docker stop ${containerId}"
                     }
-                    sh "docker stop ${containerId}"
                 }
             }
         }
 
-
         stage('Pousser l\'image sur Docker Hub') {
+            when {
+                expression {
+                    return currentBuild.currentResult == 'SUCCESS'
+                }
+            }
             steps {
-                withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')]) {
                     script {
-                        sh 'echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin'
-                        sh 'docker push $IMAGE_NAME'
+                        sh 'echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin'
+                        sh "docker push $DOCKER_IMAGE"
                     }
                 }
             }
@@ -61,10 +67,10 @@ pipeline {
 
     post {
         success {
-            echo 'Pipeline terminé avec succès.'
+            echo 'Pipeline terminé avec succès 🎉'
         }
         failure {
-            echo 'Échec du pipeline.'
+            echo 'Le pipeline a échoué ❌'
         }
     }
 }

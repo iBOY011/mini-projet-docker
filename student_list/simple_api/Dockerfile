@@ -10,19 +10,13 @@ WORKDIR /usr/src/app
 
 # Copier le fichier des dépendances et installer les packages Python
 COPY requirements.txt ./
-# RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install --upgrade pip && pip install --default-timeout=100 --no-cache-dir -r requirements.txt
-
 
 # Copier le script de l'API
 COPY student_age.py .
 
-# Créer un dossier pour les données persistantes et déclarer un volume
- RUN mkdir -p /data
-#VOLUME /data
-
-# Exposer le port 5000 pour l'API
+# Exposer le port 5000 pour l'API Flask
 EXPOSE 5000
 
 # Lancer l'API
-CMD [ "python", "./student_age.py" ]
+CMD ["python", "./student_age.py"]

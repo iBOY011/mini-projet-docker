@@ -18,7 +18,7 @@ RUN pip install --upgrade pip && pip install --default-timeout=100 --no-cache-di
 COPY student_age.py .
 
 # Créer un dossier pour les données persistantes et déclarer un volume
-# RUN mkdir /data
+ RUN mkdir -p /data
 #VOLUME /data
 
 # Exposer le port 5000 pour l'API

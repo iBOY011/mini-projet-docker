@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "iboyx/student_list_api"
+        IMAGE_NAME = "iboy01/student_list_api"
         DOCKER_CREDENTIALS_ID = "dockerhub-creds"
     }
 

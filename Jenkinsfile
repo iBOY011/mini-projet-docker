@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'docker:20.10.16-dind'
+            args '-v /var/run/docker.sock:/var/run/docker.sock'
+        }
+    }
 
     environment {
         IMAGE_NAME = "iboy01/student_list_api"
@@ -7,17 +12,11 @@ pipeline {
     }
 
     stages {
-        stage('Cloner le repo') {
-            steps {
-                echo 'Clonage géré automatiquement par Jenkins (SCM).'
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
                 dir('student_list/simple_api') {
                     script {
-                        docker.build("${IMAGE_NAME}", ".")
+                        sh 'docker build -t $IMAGE_NAME .'
                     }
                 }
             }
@@ -26,10 +25,10 @@ pipeline {
         stage('Tester l\'image') {
             steps {
                 script {
-                    def container = docker.image("${IMAGE_NAME}").run('-d -p 5000:5000')
+                    def containerId = sh(script: "docker run -d -p 5000:5000 $IMAGE_NAME", returnStdout: true).trim()
                     sleep 5
                     sh 'curl -u root:root http://localhost:5000/supmit/api/v1.0/get_student_ages'
-                    container.stop()
+                    sh "docker stop $containerId"
                 }
             }
         }
@@ -39,7 +38,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     sh """
                         echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                        docker push ${IMAGE_NAME}
+                        docker push $IMAGE_NAME
                     """
                 }
             }

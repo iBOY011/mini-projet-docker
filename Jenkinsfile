@@ -27,12 +27,14 @@ pipeline {
         stage('Tester l\'API') {
             steps {
                 script {
-                    // Monter le fichier student_age.json depuis le workspace dans le conteneur à /data/student_age.json.
+                    // Lancer le conteneur API en montant le fichier JSON en lecture seule
                     def containerId = sh(
-                        script: "docker run -d -p 5000:5000 -v ${WORKSPACE}/student_list/simple_api/student_age.json:/data/student_age.json $IMAGE_NAME",
+                        script: "docker run -d -p 5000:5000 -v ${WORKSPACE}/student_list/simple_api/student_age.json:/data/student_age.json:ro iboy01/student_list_api",
                         returnStdout: true
                     ).trim()
+                    
                     sleep 30  // Attendre que l'API démarre
+                    
                     def status = sh(script: "curl -u root:root http://localhost:5000/supmit/api/v1.0/get_student_ages", returnStatus: true)
                     if (status != 0) {
                         echo "Erreur lors de l'appel de l'API, affichage des logs du conteneur :"
@@ -43,6 +45,7 @@ pipeline {
                 }
             }
         }
+
 
         stage('Pousser l\'image sur Docker Hub') {
             steps {

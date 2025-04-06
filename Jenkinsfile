@@ -68,30 +68,23 @@ pipeline {
             }
         }
         
-        stage('Tester l\'image API') {
+        stage('Tester l\'image') {
             steps {
                 script {
-                    // Lancer le conteneur API en montant le fichier student_age.json
-                    def containerId = sh(
-                        script: "docker run -d --add-host=host.docker.internal:host-gateway -p 5000:5000 -v ${WORKSPACE}/student_list/simple_api/student_age.json:/data/student_age.json $DOCKER_IMAGE_API",
-                        returnStdout: true
-                    ).trim()
-                    
-                    // Attendre que l'API démarre
-                    sleep 30
-                    
-                    // Tester l'API avec curl (l'API doit écouter sur host '0.0.0.0' dans student_age.py)
+                    // Déclare containerId une seule fois
+                    containerId = sh(script: "docker run -d --add-host=host.docker.internal:host-gateway -p 5000:5000 -v ${WORKSPACE}/student_list/simple_api/student_age.json:/data/student_age.json $DOCKER_IMAGE_API", returnStdout: true).trim()
+                    sleep 30  // laisser le temps à l'API de démarrer
                     def status = sh(script: "curl -u root:root http://host.docker.internal:5000/supmit/api/v1.0/get_student_ages", returnStatus: true)
                     if (status != 0) {
                         echo "Erreur lors de l'appel API. Affichage des logs du conteneur API :"
                         sh "docker logs ${containerId}"
                         error "L'API ne répond pas correctement."
                     }
-                    // Arrêter le conteneur API
                     sh "docker stop ${containerId}"
                 }
             }
         }
+
         
         stage('Pousser les images sur Docker Hub') {
             steps {

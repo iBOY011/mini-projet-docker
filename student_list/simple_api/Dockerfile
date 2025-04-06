@@ -19,7 +19,7 @@ COPY student_age.py .
 
 # Créer un dossier pour les données persistantes et déclarer un volume
 # RUN mkdir /data
-VOLUME /data
+#VOLUME /data
 
 # Exposer le port 5000 pour l'API
 EXPOSE 5000

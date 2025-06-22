@@ -22,15 +22,16 @@ pipeline {
         stage('Test image') {
             steps {
                 sh '''
-                # Toujours repartir propre
+                # Nettoyage si un ancien conteneur traîne
                 docker rm -f student_list_api_test || true
 
-                # Lancer le conteneur de test sur le réseau host (pas de -p)
+                # Monte TOUT le dossier simple_api dans /data
                 CID=$(docker run -d --name student_list_api_test --network host \
-                    -v $(pwd)/student_list/simple_api/student_age.json:/data/student_age.json \
+                    -v $(pwd)/student_list/simple_api:/data:ro \
+                    -e student_age_file_path=/data/student_age.json \
                     $IMAGE_NAME)
 
-                # Boucle d’attente : 30 s max
+                # Boucle d’attente (30 s max) jusqu’à ce que l’API réponde
                 for i in {1..30}; do
                 if curl -s -u root:root http://127.0.0.1:5000/supmit/api/v1.0/get_student_ages > /dev/null; then
                     echo "API is up!"
@@ -38,7 +39,7 @@ pipeline {
                     docker rm -f $CID
                     exit 0
                 fi
-                echo "Waiting for API… ($i)"
+                echo "Waiting for API... ($i)"
                 sleep 1
                 done
 
@@ -49,6 +50,7 @@ pipeline {
                 '''
             }
         }
+
 
 
 

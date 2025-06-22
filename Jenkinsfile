@@ -22,11 +22,15 @@ pipeline {
         stage('Test image') {
             steps {
                 sh '''
-                CID=$(docker run -d --name ${IMAGE_NAME}_test -p 5001:5000 \
+                # Toujours repartir d'un état propre
+                docker rm -f student_list_api_test || true
+
+                # Lancement du conteneur de test
+                CID=$(docker run -d --name student_list_api_test -p 5001:5000 \
                     -v $(pwd)/student_list/simple_api/student_age.json:/data/student_age.json \
                     $IMAGE_NAME)
 
-                # Boucle d’attente (30 s max)
+                # Attente que l’API réponde (30 s max)
                 for i in {1..30}; do
                 if curl -s -u root:root http://127.0.0.1:5001/supmit/api/v1.0/get_student_ages > /dev/null; then
                     echo "API is up!"
@@ -38,13 +42,14 @@ pipeline {
                 sleep 1
                 done
 
-                echo "API did not start in time"; \
-                docker logs $CID || true; \
-                docker rm -f $CID; \
+                echo "API did not start in time"
+                docker logs $CID || true
+                docker rm -f $CID
                 exit 1
                 '''
             }
         }
+
 
 
         stage('Push to Docker Hub') {

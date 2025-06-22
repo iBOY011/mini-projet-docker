@@ -176,6 +176,173 @@ Le fichier JSON a bien été monté dans le conteneur grâce au volume Docker, e
 
 ---
 
+
+
+## 🌐 Déploiement sur AWS EC2
+
+### Objectif
+Déployer l'application conteneurisée sur une instance AWS EC2 pour la rendre accessible depuis Internet et valider le fonctionnement en environnement cloud.
+
+### Configuration de l'instance AWS
+- **Type d'instance** : t4g.micro (éligible au free tier)
+- **Système d'exploitation** : Ubuntu 20.04 LTS (aarch64)
+- **Architecture** : ARM64
+- **Particularité** : Image Ubuntu minimisée (packages réduits)
+
+---
+
+### Étapes de déploiement
+
+#### 1. Connexion à l'instance EC2
+```bash
+ssh ubuntu@<IP-EC2>
+```
+![Connexion SSH à l'instance EC2](./captures/aws1.png)
+
+**Observation** : L'image Ubuntu est minimisée, nécessitant l'installation manuelle des outils requis.
+
+---
+
+#### 2. Installation de Docker et Docker Compose
+```bash
+# Mise à jour du système
+sudo apt update
+
+# Installation des prérequis
+sudo apt install ca-certificates curl gnupg lsb-release
+
+# Ajout de la clé GPG officielle Docker
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+# Ajout du dépôt Docker
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# Installation de Docker
+sudo apt update
+sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+# Activation du service Docker
+sudo systemctl enable --now docker
+
+# Ajout de l'utilisateur au groupe docker
+sudo usermod -aG docker ubuntu
+newgrp docker
+```
+![Installation Docker terminée](./captures/aws2.png)
+---
+
+#### 3. Clonage du projet depuis GitHub
+```bash
+git clone https://github.com/iBOY011/mini-projet-docker.git
+cd mini-projet-docker/student_list
+```
+![Clonage du dépôt](./captures/aws3.png)
+
+---
+
+#### 4. Résolution du problème "pull access denied"
+**Problème rencontré** : Le `docker-compose.yml` référençait une image `student_list_api` non disponible sur Docker Hub.
+
+**Solution** : Construction de l'image localement
+```bash
+docker build -t student_list_api ./simple_api
+```
+![Build de l'image Docker](./captures/aws4.png)
+
+---
+
+#### 5. Correction du problème de volume
+**Problème** : Le fichier `docker-compose.yml` utilisait un chemin absolu inexistant sur la VM AWS.
+
+**Correction** : Modification du volume pour utiliser un chemin relatif
+```yaml
+# Avant (chemin absolu - ne fonctionne pas sur AWS)
+volumes:
+  - /home/iboy/mini-projet-docker/student_list/website:/var/www/html
+
+# Après (chemin relatif - fonctionne partout)
+volumes:
+  - ./website:/var/www/html
+```
+
+**Suppression** de la ligne obsolète `version: "3"` pour éliminer les warnings.
+
+---
+
+#### 6. Déploiement avec Docker Compose
+```bash
+docker compose up -d --force-recreate
+```
+![Déploiement réussi](./captures/aws5.png)
+
+**Vérification des conteneurs** :
+```bash
+docker compose ps
+```
+Les deux services sont correctement démarrés :
+- `student_list_api_container` (API Flask)
+- `student_list-website-1` (Interface web PHP)
+
+---
+
+#### 7. Configuration des ports AWS (Security Group)
+Ouverture des ports suivants dans le Security Group AWS :
+- **Port 5000** : API Flask
+- **Port 8081** : Interface web PHP
+- **Port 8083** : Interface du registre Docker (optionnel)
+
+---
+
+#### 8. Tests fonctionnels sur AWS
+
+**Test de l'API Flask** :
+```bash
+curl -u root:root -X GET http://localhost:5000/supmit/api/v1.0/get_student_ages
+```
+![Test API réussi](./captures/aws6.png)
+
+**Résultat** : L'API retourne correctement la liste des étudiants avec leurs âges au format JSON.
+
+**Test de l'interface web** :
+- Accès via : `http://<IP-EC2>:8081/`
+- L'interface PHP interroge l'API via le réseau Docker interne
+- Affichage correct de la liste des étudiants
+
+---
+
+### 🔧 Problèmes rencontrés et solutions
+
+| Problème | Cause | Solution |
+|----------|--------|----------|
+| "pull access denied" | Image inexistante sur Docker Hub | Build local avec `docker build` |
+| Site web 404 | Chemin absolu dans volume | Utilisation d'un chemin relatif |
+| Image minimisée | AWS Ubuntu optimisée | Installation manuelle de Docker |
+| Ports fermés | Security Group restrictif | Ouverture des ports 5000, 8081, 8083 |
+
+---
+
+### 📊 Résultats du déploiement AWS
+
+✅ **API Flask** : Accessible sur `http://<IP-EC2>:5000`  
+✅ **Interface web** : Accessible sur `http://<IP-EC2>:8081`  
+✅ **Communication interne** : Réseau Docker fonctionnel  
+✅ **Authentification** : Basic Auth (root:root) opérationnelle  
+✅ **Données** : Volume JSON correctement monté  
+✅ **Haute disponibilité** : Services redémarrés automatiquement  
+
+---
+
+### 🚀 Avantages du déploiement cloud
+
+- **Accessibilité mondiale** : Application disponible 24h/24 depuis Internet
+- **Scalabilité** : Possibilité d'augmenter les ressources selon le besoin
+- **Isolation** : Conteneurs Docker garantissent la portabilité
+- **Monitoring** : Logs AWS CloudWatch disponibles
+- **Sécurité** : Contrôle fin des accès via Security Groups
+- **Économique** : Instance t4g.micro éligible au free tier AWS
+
+---
+
 ## 🧠 Conclusion
 
 Ce projet nous a permis de mettre en pratique plusieurs compétences clés :

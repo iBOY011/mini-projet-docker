@@ -2,79 +2,53 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = 'iboy01/student_list_api'
+        IMAGE_NAME      = 'student_list_api'
+        DOCKERHUB_CREDS = credentials('dockerhub-creds')  // <- ton ID Jenkins
     }
 
     stages {
-        stage('Cloner le dépôt') {
+        stage('Checkout') {
             steps {
-                echo 'Clonage du dépôt'
-                checkout scm
+                git url: 'https://github.com/iBOY011/mini-projet-docker.git'
             }
         }
 
-        stage('Construire l\'image Docker') {
+        stage('Build image') {
             steps {
-                dir('student_list/simple_api') {
-                    script {
-                        sh "docker build -t ${IMAGE_NAME} ."
-                    }
-                }
+                sh 'docker build -t $IMAGE_NAME student_list/simple_api'
             }
         }
 
-        stage("Tester l'API") {
+        stage('Test image') {
             steps {
-                script {
-                    def workspacePath = pwd()
-                    def containerId = sh(
-                        script: """
-                            docker run -d -p 5000:5000 \
-                            -v ${workspacePath}/student_list/simple_api/student_age.json:/data/student_age.json:ro \
-                            ${IMAGE_NAME}
-                        """,
-                        returnStdout: true
-                    ).trim()
+                sh '''
+                docker run -d --name ${IMAGE_NAME}_test --network host \
+                  -v $(pwd)/student_list/simple_api/student_age.json:/data/student_age.json \
+                  $IMAGE_NAME
 
-                    sleep(time: 30, unit: "SECONDS")
-
-                    def response = sh(
-                        script: 'curl -u root:root http://localhost:5000/supmit/api/v1.0/get_student_ages',
-                        returnStatus: true
-                    )
-
-                    if (response != 0) {
-                        echo "Erreur lors de l'appel de l'API, affichage des logs du conteneur :"
-                        sh "docker logs ${containerId}"
-                        error("L'API ne répond pas correctement.")
-                    }
-
-                    sh "docker stop ${containerId}"
-                }
+                sleep 5
+                curl -u root:root http://127.0.0.1:5000/supmit/api/v1.0/get_student_ages
+                docker rm -f ${IMAGE_NAME}_test
+                '''
             }
         }
 
-        stage('Pousser l\'image sur Docker Hub') {
-            when {
-                expression { currentBuild.result == null || currentBuild.result == 'SUCCESS' }
-            }
+        stage('Push to Docker Hub') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    script {
-                        sh "echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin"
-                        sh "docker push ${IMAGE_NAME}"
-                    }
-                }
+                sh '''
+                echo $DOCKERHUB_CREDS_PSW | \
+                  docker login -u $DOCKERHUB_CREDS_USR --password-stdin
+
+                docker tag $IMAGE_NAME $DOCKERHUB_CREDS_USR/$IMAGE_NAME:latest
+                docker push      $DOCKERHUB_CREDS_USR/$IMAGE_NAME:latest
+                '''
             }
         }
     }
 
     post {
-        success {
-            echo 'Le pipeline a réussi ✅'
-        }
-        failure {
-            echo 'Le pipeline a échoué ❌'
+        always {
+            sh 'docker rmi $IMAGE_NAME || true'
         }
     }
 }

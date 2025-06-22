@@ -130,50 +130,101 @@ docker push localhost:5000/student_list_api
 ```
 
 ---
+## 🚀 Pipeline CI/CD sous Jenkins
 
-🚀 Intégration Continue & Déploiement (CI/CD)
-Une pipeline CI/CD a été configurée avec Jenkins pour automatiser les étapes suivantes :
+### 1. Présentation générale  
+Pour automatiser l’intégration et le déploiement de l’API *student_list*, nous avons mis en place un **pipeline déclaratif Jenkins**.  
+Chaque commit déclenche un build complet qui :
 
-Clonage du dépôt Git
-Build de l'image Docker de l'API
-Test de l'API Flask avec un appel curl
-Push automatique de l'image sur Docker Hub si le test est réussi
-
-Exemple de pipeline Jenkinsfile
-groovy
----
-
-## 📁 Fichiers du projet
-
-- `Dockerfile` : Construction de l'image Python
-- `docker-compose.yml` : Déploiement de l’API + client web
-- `docker-compose-registry.yml` : Déploiement du registre Docker privé avec UI
+| Étape | Objectif | Résultat attendu |
+|-------|----------|------------------|
+| **Checkout SCM** | Récupération du dépôt GitHub | Code à jour dans l’agent Jenkins |
+| **Build image** | Construction de l’image Docker de l’API | Image `student_list_api:latest` créée |
+| **Test image** | Exécution de l’image et appel `curl` pour vérifier l’API | Retour JSON correct → succès |
+| **Push to Docker Hub** | Publication de l’image si les tests sont verts | Tag `latest` mis à jour |
+| **Post Actions** | Nettoyage de l’agent (prune d’image) | Espace disque libéré |
 
 ---
 
-## ✅ Résultat final
-Une API Flask Dockerisée avec une interface web fonctionnelle + une interface de registre privé consultable via navigateur.
-Après exécution du pipeline sur Jenkins, l’application a été :
+### 2. Configuration Jenkins
 
-    Construite avec succès via un Dockerfile optimisé ✅
+| Élément | Valeur / Action |
+|---------|-----------------|
+| **Image Jenkins** | `jenkins/jenkins:lts` exécutée dans un conteneur Docker |
+| **Docker-in-Docker** | Montage : `-v /var/run/docker.sock:/var/run/docker.sock` |
+| **CLI Docker** | Disponible dans le conteneur Jenkins (montage du binaire hôte) |
+| **Réseau** | `--network host` pour simplifier les tests (pas de conflit de ports) |
+| **Credentials** | *dockerhub-creds* (pair **ID / Secret**) pour l’authentification Docker Hub |
+| **Volumétrie** | Dossier Jenkins persistant : `jenkins_home:/var/jenkins_home` |
 
-    Testée automatiquement avec un appel curl pour valider le fonctionnement de l’API ✅
+---
 
-    Déployée sur Docker Hub si l’API fonctionne correctement ✅
+### 3. Détail du `Jenkinsfile`
 
-Le fichier JSON a bien été monté dans le conteneur grâce au volume Docker, et l’API retourne les bonnes données :
-`{
-`  "student_ages": {
-`    "Ahmed": "20", 
-`    "Amine": "20", 
- `   "Hiba": "21", 
- `   "Meryem": "23", 
- `   "Omar": "20", 
- `   "Sara": "23"
- ` }
-`}
+```groovy
+pipeline {
+    agent any
 
+    environment {
+        IMAGE_NAME      = 'student_list_api'
+        DOCKERHUB_CREDS = credentials('dockerhub-creds')
+    }
 
+    stages {
+
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/iBOY011/mini-projet-docker.git'
+            }
+        }
+
+        stage('Build image') {
+            steps {
+                sh 'docker build -t $IMAGE_NAME student_list/simple_api'
+            }
+        }
+
+        stage('Test image') {
+            steps {
+                sh '''
+                docker rm -f student_list_api_test || true
+
+                CID=$(docker run -d --name student_list_api_test --network host \
+                      -v $(pwd)/student_list/simple_api/student_age.json:/tmp/student_age.json:ro \
+                      -e student_age_file_path=/tmp/student_age.json \
+                      $IMAGE_NAME)
+
+                # Attente que l’API réponde
+                for i in {1..30}; do
+                  curl -s -u root:root http://127.0.0.1:5000/supmit/api/v1.0/get_student_ages && break
+                  sleep 1
+                done
+
+                docker rm -f $CID
+                '''
+            }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                sh '''
+                echo $DOCKERHUB_CREDS_PSW | docker login -u $DOCKERHUB_CREDS_USR --password-stdin
+                docker tag $IMAGE_NAME $DOCKERHUB_CREDS_USR/$IMAGE_NAME:latest
+                docker push $DOCKERHUB_CREDS_USR/$IMAGE_NAME:latest
+                '''
+            }
+        }
+    }
+
+    post {
+        always {
+            sh 'docker rmi $IMAGE_NAME || true'
+        }
+    }
+}
+```
+![Global credentials](captures/jen1.png)
+![Build](captures/jen2.png)
 ---
 
 
